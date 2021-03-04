@@ -1,5 +1,6 @@
 'use strict'
 const Encuesta = require('../models/ecuesta.model');
+const { options } = require('../routes/encuesta.rutas');
 
 function agregarEncuesta(req, res) {
     var params = req.body;
@@ -85,12 +86,73 @@ function obtenerComentario(req, res) {
     })
 }
 
+function eliminarComentario(req, res) {
+    var idComentario = req.params.idComentario;
+
+    Encuesta.findOneAndUpdate({"listaComentarios._id": idComentario}, {$pull: {listaComentarios: {_id: idComentario}}}
+    ,{new: true, useFindAndModify: false}, (err, comentarioEliminado) =>{
+        if (err) return res.status(500).send({ mensaje: 'Error en la peticion de Comentario', err});
+        if (!comentarioEliminado) return res.status(500).send({ mensaje: 'Error al eliminar el Comentario'});
+        return res.status(200).send({comentarioEliminado});
+    })
+}
+
+/*function obtenerComentarioPorTexto(req, res) {
+    var bodyTextoComentario = req.body.textoComentario;
+                                            //el regex es para buscar y filtrar algo     El options es para distinguir mayusculas
+    Encuesta.find({"listaComentarios.textoComentario": {$regex: bodyTextoComentario, $options: 'i' } }, {"listaComentarios.$": 1}, (err, encuestasEncontradas) =>{
+        if (err) return res.status(500).send({ mensaje: 'Error en la peticion de Comentario', err});
+        if (!encuestasEncontradas) return res.status(500).send({ mensaje: 'Error al Obtener los Comentarios'});
+        return res.status(200).send({encuestasEncontradas});
+    }).populate('listaComentarios.idUsuarioComentario')
+}*/
+/*
+function obtenerComentarioPorTexto(req, res) {
+    var textoComentario ​ = req.body.textoComentario;
+
+    Encuesta.aggregate([
+
+        {​​
+        
+        $unwind: "$listaComentarios"
+        
+        }​​,
+        
+        {​​
+        
+        $match: {​​"listaComentarios.textoComentario": {​​$regex: textoComentario, $options: 'i'}​​}​​
+        
+        }​​,
+        
+        {​​
+        
+        $group: {​​"_id": "$_id", "listaComentarios": {​​$push: "$listaComentarios"}​​}​​
+        
+        }​​
+        
+        ]).exec((err, resp) => {​​
+        
+        res.send(resp)
+        
+        }​​);
+
+}*/
+function obtenerComentarioforTexto(req, res) {
+    var textoComentario = req.body.textoComentario;
+    Encuesta.aggregate([{$unwind: "$listaComentarios"}, {$match: {"listaComentarios.textoComentario":{$regex: textoComentario, $options: 'i'}}}, {$group: {"_id": "$_id", "listaComentarios": {$push: "$listaComentarios"}}}]).exec((err, resp) =>{
+        //if (err) return res.status
+        return res.status(200).send({resp});
+    })
+}
+
 module.exports = {
     agregarEncuesta,
     obtenerEcuestas,
     agregarComentarioEncuesta,
     editarComentarioEncuesta,
-    obtenerComentario
+    obtenerComentario,
+    eliminarComentario,
+    obtenerComentarioforTexto
 }
 
 //lol

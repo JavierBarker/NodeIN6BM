@@ -72,7 +72,7 @@ function obtenerUsuarioID(req, res) {
         return res.status(200).send({usuarioEncontrado})
     })
 }
- 
+  
 function login(req, res) {
     var params = req.body;//traemos el cuerpo de datos
     Usuario.findOne({ email: params.email}, (err, usuarioEncontrado)=>{

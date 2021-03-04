@@ -15,4 +15,8 @@ api.put('/agregarComentario/:idEncuesta', md_autenticacion.ensureAuth, encuestaC
 api.put('/editarComentario/:idEncuesta/:idComentario', md_autenticacion.ensureAuth, encuestaControlador.editarComentarioEncuesta);
 
 api.get('/obtenerComentario/:idEncuesta/:idComentario', md_autenticacion.ensureAuth, encuestaControlador.obtenerComentario)
+
+api.delete('/eliminiarComentario/:idComentario', md_autenticacion.ensureAuth, encuestaControlador.eliminarComentario);
+
+api.post('/obtenerComentarioforTexto', md_autenticacion.ensureAuth, encuestaControlador.obtenerComentarioforTexto);
 module.exports = api;
